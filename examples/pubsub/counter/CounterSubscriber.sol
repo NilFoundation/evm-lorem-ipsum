@@ -1,7 +1,7 @@
 pragma solidity ^0.8.16;
 
-import "../../../contracts/pubsub/LoremIpsumPubSub.sol";
-import "../../../contracts/pubsub/interfaces/SubscriptionReceiver.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/pubsub/LoremIpsumPubSub.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/pubsub/interfaces/SubscriptionReceiver.sol";
 
 /// @notice Example counter deployed on the source chain to listen to.
 /// @dev Importantly, this contract does not need any special logic to handle it's events being subscribed to.
@@ -46,12 +46,12 @@ contract CounterSubscriber is SubscriptionReceiver {
     mapping(bytes32 => bool) activeSubscriptions;
 
     constructor(
-        address _telepathyPubSub,
+        address _pubSub,
         uint32 _sourceChainId,
         address _sourceAddress,
         uint64 _startSlot,
         uint64 _endSlot
-    ) SubscriptionReceiver(_telepathyPubSub) {
+    ) SubscriptionReceiver(_pubSub) {
         EVENT_SOURCE_CHAIN_ID = _sourceChainId;
         EVENT_SOURCE_ADDRESS = _sourceAddress;
         START_SLOT = _startSlot;

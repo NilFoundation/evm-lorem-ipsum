@@ -1,11 +1,8 @@
 pragma solidity ^0.8.16;
 
-import "forge-std/Test.sol";
-import "forge-std/console.sol";
-
-import "../../../contracts/amb/mocks/MockLoremIpsum.sol";
-import "../../../contracts/pubsub/LoremIpsumPubSub.sol";
-import "../../../contracts/amb/interfaces/LoremIpsumHandler.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/amb/mocks/MockLoremIpsum.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/pubsub/LoremIpsumPubSub.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/amb/interfaces/LoremIpsumHandler.sol";
 import "./LoremIpsumValidator.sol";
 
 interface IForeignAMB {}

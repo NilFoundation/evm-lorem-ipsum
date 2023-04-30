@@ -1,3 +1,7 @@
+pragma solidity 0.8.16;
+
+import '@nilfoundation/evm-lorem-ipsum/contracts/interfaces/ILightClient.sol';
+
 contract BeaconValidatorBalance {
     uint256 public constant VALIDATOR_PUBKEY_GINDEX = 0;
     uint256 public constant BALANCE_G_INDEX = 1;
@@ -10,11 +14,9 @@ contract BeaconValidatorBalance {
         lightclient = _lightclient;
     }
 
-    function addIndexAndPubkey(
-        uint256 slot, uint256 index, bytes32 publicKey, bytes32[] memory proof
-    ) public {
+    function addIndexAndPubkey(uint256 slot, uint256 index, bytes32 publicKey, bytes32[] memory proof) public {
         bytes32 headerRoot = ILightClient(lightclient).headers(slot);
-        bool isValidProof = SSZ.verifyMerkleBranch(
+        bool isValidProof = SSZ.isValidMerkleBranch(
             publicKey,
             concatGIndex(VALIDATOR_PUBKEY_GINDEX, index),
             proof,
@@ -26,7 +28,7 @@ contract BeaconValidatorBalance {
 
     function addBalanceAtSlot(uint256 slot, uint256 index, uint256 balance, bytes32[] memory proof) public {
         bytes32 headerRoot = ILightClient(lightclient).headers(slot);
-        bool isValidProof = SSZ.verifyMerkleBranch(
+        bool isValidProof = SSZ.isValidMerkleBranch(
             bytes32(balance),
             concatGIndex(BALANCE_G_INDEX, index),
             proof,

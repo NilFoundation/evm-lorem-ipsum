@@ -60,7 +60,7 @@ contract LightClientFixture is CommonBase {
         );
     }
 
-    function convertToGroth16Proof(Step memory step) public pure returns (Groth16Proof memory) {
+    function convertToGroth16Proof(Step memory step) public pure returns (PlaceholderProof memory) {
         uint256[2] memory a = [strToUint(step.a[0]), strToUint(step.a[1])];
         uint256[2][2] memory b = [
         [strToUint(step.b[0][1]), strToUint(step.b[0][0])],
@@ -74,7 +74,7 @@ contract LightClientFixture is CommonBase {
     function convertToGroth16Proof(Rotate memory rotate)
     public
     pure
-    returns (Groth16Proof memory)
+    returns (PlaceholderProof memory)
     {
         uint256[2] memory a = [strToUint(rotate.a[0]), strToUint(rotate.a[1])];
         uint256[2][2] memory b = [

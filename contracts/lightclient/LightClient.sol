@@ -11,10 +11,10 @@ import "./RotateVerifier.sol";
 
 import "../libraries/SimpleSerialize.sol";
 
-    struct Groth16Proof {
-        uint256[2] a;
-        uint256[2][2] b;
-        uint256[2] c;
+    struct PlaceholderProof {
+        bytes blob;
+        uint256[][] init_params;
+        int256[][][] columns_rotations;
     }
 
     struct LightClientStep {
@@ -23,19 +23,19 @@ import "../libraries/SimpleSerialize.sol";
         uint256 participation;
         bytes32 finalizedHeaderRoot;
         bytes32 executionStateRoot;
-        Groth16Proof proof;
+        PlaceholderProof proof;
     }
 
     struct LightClientRotate {
         LightClientStep step;
         bytes32 syncCommitteeSSZ;
         bytes32 syncCommitteePoseidon;
-        Groth16Proof proof;
+        PlaceholderProof proof;
     }
 
 /// @notice Uses Ethereum 2's Sync Committee Protocol to keep up-to-date with block headers from a
 ///         Beacon Chain. This is done in a gas-efficient manner using zero-knowledge proofs.
-contract LightClient is ILightClient, StepVerifier, RotateVerifier, Ownable {
+contract LightClient is ILightClient {
     bytes32 public immutable GENESIS_VALIDATORS_ROOT;
     uint256 public immutable GENESIS_TIME;
     uint256 public immutable SECONDS_PER_SLOT;
@@ -50,6 +50,10 @@ contract LightClient is ILightClient, StepVerifier, RotateVerifier, Ownable {
     uint256 internal constant EXECUTION_STATE_ROOT_INDEX = 402;
 
     address verifier;
+
+    address rotateGate;
+
+    address stepGate;
 
     /// @notice Whether the light client has had conflicting variables for the same slot.
     bool public consistent = true;
@@ -73,6 +77,8 @@ contract LightClient is ILightClient, StepVerifier, RotateVerifier, Ownable {
     event SyncCommitteeUpdate(uint256 indexed period, bytes32 indexed root);
 
     constructor(address placeholderVerifier,
+        address step,
+        address rotate,
         bytes32 genesisValidatorsRoot,
         uint256 genesisTime,
         uint256 secondsPerSlot,
@@ -80,9 +86,11 @@ contract LightClient is ILightClient, StepVerifier, RotateVerifier, Ownable {
         uint256 syncCommitteePeriod,
         bytes32 syncCommitteePoseidon,
         uint32 sourceChainId,
-        uint16 finalityThreshold
-    ) {
+        uint16 finalityThreshold) {
+
         verifier = placeholderVerifier;
+        stepGate = step;
+        rotateGate = rotate;
 
         GENESIS_VALIDATORS_ROOT = genesisValidatorsRoot;
         GENESIS_TIME = genesisTime;
@@ -93,8 +101,16 @@ contract LightClient is ILightClient, StepVerifier, RotateVerifier, Ownable {
         setSyncCommitteePoseidon(syncCommitteePeriod, syncCommitteePoseidon);
     }
 
-    function setVerifier(address verifier) external onlyOwner {
-        this.verifier = verifier;
+    function setVerifier(address v) external onlyOwner {
+        verifier = v;
+    }
+
+    function setRotateGate(address gateArgument) external onlyOwner {
+        rotateGate = gateArgument;
+    }
+
+    function setStepGate(address gateArgument) external onlyOwner {
+        stepGate = gateArgument;
     }
 
     /// @notice Updates the head of the light client to the provided slot.
@@ -114,9 +130,7 @@ contract LightClient is ILightClient, StepVerifier, RotateVerifier, Ownable {
         }
 
         if (finalized) {
-            setSlotRoots(
-                update.finalizedSlot, update.finalizedHeaderRoot, update.executionStateRoot
-            );
+            setSlotRoots(update.finalizedSlot, update.finalizedHeaderRoot, update.executionStateRoot);
         } else {
             revert("Not enough participants");
         }
@@ -153,7 +167,7 @@ contract LightClient is ILightClient, StepVerifier, RotateVerifier, Ownable {
     }
 
     /// @notice Serializes the public inputs into a compressed form and verifies the step proof.
-    function zkLightClientStep(LightClientStep memory update) internal view {
+    function zkLightClientStep(LightClientStep calldata update) internal view {
         bytes32 attestedSlotLE = SSZ.toLittleEndian(update.attestedSlot);
         bytes32 finalizedSlotLE = SSZ.toLittleEndian(update.finalizedSlot);
         bytes32 participationLE = SSZ.toLittleEndian(update.participation);
@@ -169,14 +183,14 @@ contract LightClient is ILightClient, StepVerifier, RotateVerifier, Ownable {
         uint256 t = uint256(SSZ.toLittleEndian(uint256(h)));
         t = t & ((uint256(1) << 253) - 1);
 
-        Groth16Proof memory proof = update.proof;
+        PlaceholderProof memory proof = update.proof;
         uint256[1] memory inputs = [uint256(t)];
-        require(verifyProofStep(proof.a, proof.b, proof.c, inputs));
+        require(IVerifier(verifier).verify(proof.blob, proof.init_data, proof.columns_rotations, stepGate));
     }
 
     /// @notice Serializes the public inputs and verifies the rotate proof.
-    function zkLightClientRotate(LightClientRotate memory update) internal view {
-        Groth16Proof memory proof = update.proof;
+    function zkLightClientRotate(LightClientRotate calldata update) internal view {
+        PlaceholderProof memory proof = update.proof;
         uint256[65] memory inputs;
 
         uint256 syncCommitteeSSZNumeric = uint256(update.syncCommitteeSSZ);
@@ -191,7 +205,7 @@ contract LightClient is ILightClient, StepVerifier, RotateVerifier, Ownable {
         }
         inputs[32] = uint256(SSZ.toLittleEndian(uint256(update.syncCommitteePoseidon)));
 
-        require(verifyProofRotate(proof.a, proof.b, proof.c, inputs));
+        require(IVerifier(verifier).verify(proof.blob, proof.init_data, proof.columns_rotations, rotateGate));
     }
 
     /// @notice Gets the sync committee period from a slot.
@@ -208,8 +222,7 @@ contract LightClient is ILightClient, StepVerifier, RotateVerifier, Ownable {
     /// @dev Checks if roots exists for the slot already. If there is, check for a conflict between
     ///      the given roots and the existing roots. If there is an existing header but no
     ///      conflict, do nothing. This avoids timestamp renewal DoS attacks.
-    function setSlotRoots(uint256 slot, bytes32 finalizedHeaderRoot, bytes32 executionStateRoot)
-    internal {
+    function setSlotRoots(uint256 slot, bytes32 finalizedHeaderRoot, bytes32 executionStateRoot) internal {
         if (headers[slot] != bytes32(0)) {
             if (headers[slot] != finalizedHeaderRoot) {
                 consistent = false;
@@ -232,10 +245,7 @@ contract LightClient is ILightClient, StepVerifier, RotateVerifier, Ownable {
 
     /// @notice Sets the sync committee poseidon for a given period.
     function setSyncCommitteePoseidon(uint256 period, bytes32 poseidon) internal {
-        if (
-            syncCommitteePoseidons[period] != bytes32(0)
-            && syncCommitteePoseidons[period] != poseidon
-        ) {
+        if (syncCommitteePoseidons[period] != bytes32(0) && syncCommitteePoseidons[period] != poseidon) {
             consistent = false;
             return;
         }

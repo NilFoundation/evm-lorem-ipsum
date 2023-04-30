@@ -6,7 +6,7 @@ import "ds-test/test.sol";
 import "forge-std/Vm.sol";
 import "forge-std/Test.sol";
 
-import "src/amb/mocks/MockLoremIpsum.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/amb/mocks/MockLoremIpsum.sol";
 
 import "./Tokens.sol";
 

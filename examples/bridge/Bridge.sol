@@ -4,8 +4,8 @@ pragma solidity 0.8.16;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "../../contracts/amb/interfaces/ILoremIpsum.sol";
-import "../../contracts/amb/interfaces/LoremIpsumHandler.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/amb/interfaces/ILoremIpsum.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/amb/interfaces/LoremIpsumHandler.sol";
 
 import "./Tokens.sol";
 

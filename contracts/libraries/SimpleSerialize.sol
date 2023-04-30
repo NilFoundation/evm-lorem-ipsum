@@ -26,10 +26,7 @@ library SSZ {
     }
 
     function restoreMerkleRoot(bytes32 leaf, uint256 index, bytes32[] memory branch)
-    internal
-    pure
-    returns (bytes32)
-    {
+    internal pure returns (bytes32) {
         require(2 ** (branch.length + 1) > index);
         bytes32 value = leaf;
         uint256 i = 0;
@@ -46,19 +43,13 @@ library SSZ {
     }
 
     function isValidMerkleBranch(bytes32 leaf, uint256 index, bytes32[] memory branch, bytes32 root)
-    internal
-    pure
-    returns (bool)
-    {
+    internal pure returns (bool) {
         bytes32 restoredMerkleRoot = restoreMerkleRoot(leaf, index, branch);
         return root == restoredMerkleRoot;
     }
 
     function sszBeaconBlockHeader(BeaconBlockHeader memory header)
-    internal
-    pure
-    returns (bytes32)
-    {
+    internal pure returns (bytes32) {
         bytes32 left = sha256(
             bytes.concat(
                 sha256(
@@ -78,10 +69,7 @@ library SSZ {
     }
 
     function computeDomain(bytes4 forkVersion, bytes32 genesisValidatorsRoot)
-    internal
-    pure
-    returns (bytes32)
-    {
+    internal pure returns (bytes32) {
         return bytes32(uint256(0x07 << 248))
         | (sha256(abi.encode(forkVersion, genesisValidatorsRoot)) >> 32);
     }

@@ -1,17 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.16;
 
-import "forge-std/console.sol";
-import "ds-test/test.sol";
-import "forge-std/Vm.sol";
-import "forge-std/Test.sol";
+import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetFixedSupply.sol";
 
-import "openzeppelin-contracts/token/ERC20/presets/ERC20PresetFixedSupply.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/amb/mocks/MockLoremIpsum.sol";
 
 import "./Bridge.sol";
 import "./Tokens.sol";
-
-import "../../contracts/amb/mocks/MockLoremIpsum.sol";
 
 contract BridgeTest is Test {
     uint32 constant SOURCE_CHAIN = 1;

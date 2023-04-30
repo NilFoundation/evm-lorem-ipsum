@@ -2,10 +2,9 @@ pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "../../../contracts/pubsub/interfaces/SubscriptionReceiver.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/pubsub/interfaces/SubscriptionReceiver.sol";
 
 /// @title LoremIpsumValidator
-/// @author Succinct Labs
 /// @notice A validator for the ETH (Foreign) -> Gnosis (Home) bridge that relies on the Telepathy Protocol
 ///         for proof of consensus in verifying the UserRequestForAffirmation event was emitted on Ethereum.
 contract LoremIpsumValidator is SubscriptionReceiver, Ownable {
@@ -30,14 +29,14 @@ contract LoremIpsumValidator is SubscriptionReceiver, Ownable {
     bool executeAffirmationsEnabled;
 
     constructor(
-        address _telepathyPubSub,
+        address _pubSub,
         uint32 _sourceChainId,
         address _sourceAddress,
         uint64 _startSlot,
         uint64 _endSlot,
         address _homeAMB,
         address _owner
-    ) SubscriptionReceiver(_telepathyPubSub) {
+    ) SubscriptionReceiver(_pubSub) {
         EVENT_SOURCE_CHAIN_ID = _sourceChainId;
         EVENT_SOURCE_ADDRESS = _sourceAddress;
         START_SLOT = _startSlot;
