@@ -21,8 +21,8 @@ contract SimpleNFTAirdrop is NFTAirdrop {
 }
 
 contract NFTAirdropTest is Test {
-    MockLoremIpsum telepathyRouterSrc;
-    MockLoremIpsum telepathyRouterDst;
+    MockLoremIpsum messageRouterSrc;
+    MockLoremIpsum messageRouterDst;
     LoremIpsumOracleFulfiller fulfiller;
     LoremIpsumOracle oracle;
     ERC721Mock nft;
@@ -35,13 +35,13 @@ contract NFTAirdropTest is Test {
     address USER2 = makeAddr("user2");
 
     function setUp() public {
-        telepathyRouterSrc = new MockLoremIpsum(FULFILLER_CHAIN);
-        telepathyRouterDst = new MockLoremIpsum(ORACLE_CHAIN);
-        telepathyRouterSrc.addTelepathyReceiver(ORACLE_CHAIN, telepathyRouterDst);
-        fulfiller = new LoremIpsumOracleFulfiller(address(telepathyRouterSrc));
+        messageRouterSrc = new MockLoremIpsum(FULFILLER_CHAIN);
+        messageRouterDst = new MockLoremIpsum(ORACLE_CHAIN);
+        messageRouterSrc.addMessageReceiver(ORACLE_CHAIN, messageRouterDst);
+        fulfiller = new LoremIpsumOracleFulfiller(address(messageRouterSrc));
         oracle = new LoremIpsumOracle(
             FULFILLER_CHAIN,
-            address(telepathyRouterDst),
+            address(messageRouterDst),
             address(fulfiller)
         );
         nft = new ERC721Mock("Test NFT", "NFT");
@@ -67,15 +67,15 @@ contract NFTAirdropTest is Test {
     }
 
     /// @dev Gets Router message and decodes the remote query data+success
-    function getOracleResponse(uint64 telepathyNonce)
+    function getOracleResponse(uint64 messageNonce)
         internal
         view
         returns (bytes memory responseData, bool responseSuccess)
     {
-        (,,,,,, bytes memory telepathyData) = telepathyRouterSrc.sentMessages(telepathyNonce);
+        (,,,,,, bytes memory messageData) = messageRouterSrc.sentMessages(messageNonce);
 
         (,,, responseData, responseSuccess) =
-            abi.decode(telepathyData, (uint256, bytes32, address, bytes, bool));
+            abi.decode(messageData, (uint256, bytes32, address, bytes, bool));
     }
 
     function testSimple() public {
@@ -83,7 +83,7 @@ contract NFTAirdropTest is Test {
         nft.mint(USER, tokenId);
 
         sendClaim(USER, tokenId);
-        telepathyRouterSrc.executeNextMessage();
+        messageRouterSrc.executeNextMessage();
         assertEq(USER.balance, 1 ether);
     }
 

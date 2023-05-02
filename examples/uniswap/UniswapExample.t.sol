@@ -33,7 +33,7 @@ contract UniswapTWAPTest is Test {
 
         router = new MockLoremIpsum(SOURCE_CHAIN);
         receiver = new MockLoremIpsum(DEST_CHAIN);
-        router.addTelepathyReceiver(DEST_CHAIN, receiver);
+        router.addMessageReceiver(DEST_CHAIN, receiver);
         twapSender = new CrossChainTWAPRoute(address(router));
         twapReceiver =
             new CrossChainTWAPReceiver(SOURCE_CHAIN, address(twapSender), address(receiver));

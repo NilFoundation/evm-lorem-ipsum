@@ -21,7 +21,7 @@ contract CounterTest is Test {
     function setUp() public {
         router = new MockLoremIpsum(SOURCE_CHAIN);
         receiver = new MockLoremIpsum(TARGET_CHAIN);
-        router.addTelepathyReceiver(TARGET_CHAIN, receiver);
+        router.addMessageReceiver(TARGET_CHAIN, receiver);
 
         source = new SourceCounter(address(router), TARGET_CHAIN);
         target = new TargetCounter(address(receiver));

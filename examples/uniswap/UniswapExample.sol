@@ -12,13 +12,11 @@ contract CrossChainTWAPRoute {
     ILoremIpsumRouter router;
     mapping(uint32 => address) public deliveringContracts;
 
-    event Route(
-        uint32 indexed chainId,
+    event Route(uint32 indexed chainId,
         address poolAddress,
         uint32 twapInterval,
         uint256 timestamp,
-        uint256 price
-    );
+        uint256 price);
 
     constructor(address _router) {
         router = ILoremIpsumRouter(_router);

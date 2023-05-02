@@ -4,10 +4,10 @@ pragma solidity ^0.8.16;
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 
-import "../../contracts/amb/interfaces/ILoremIpsum.sol";
-import "../../contracts/amb/mocks/MockLoremIpsum.sol";
-import "../../contracts/oracle/LoremIpsumOracle.sol";
-import "../../contracts/oracle/LoremIpsumOracleFulfiller.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/amb/interfaces/ILoremIpsum.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/amb/mocks/MockLoremIpsum.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/oracle/LoremIpsumOracle.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/oracle/LoremIpsumOracleFulfiller.sol";
 
 contract MockMainnetData {
     uint256 val = block.timestamp;
@@ -58,7 +58,7 @@ contract LoremIpsumOracleTest is Test {
     function setUp() public {
         routerSrc = new MockLoremIpsum(FULFILLER_CHAIN);
         routerDst = new MockLoremIpsum(ORACLE_CHAIN);
-        routerSrc.addTelepathyReceiver(ORACLE_CHAIN, routerDst);
+        routerSrc.addMessageReceiver(ORACLE_CHAIN, routerDst);
         fulfiller = new LoremIpsumOracleFulfiller(address(routerSrc));
         oracle = new LoremIpsumOracle{salt: 0}(
             FULFILLER_CHAIN,

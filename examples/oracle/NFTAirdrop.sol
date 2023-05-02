@@ -2,7 +2,7 @@ pragma solidity ^0.8.16;
 
 import "openzeppelin-contracts/token/ERC721/IERC721.sol";
 
-import "../../contracts/oracle/LoremIpsumOracle.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/oracle/LoremIpsumOracle.sol";
 
     struct Claim {
         address sender;
