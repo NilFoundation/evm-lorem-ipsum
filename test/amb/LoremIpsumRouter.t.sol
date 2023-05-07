@@ -1,14 +1,10 @@
 pragma solidity 0.8.16;
 
-import "forge-std/Vm.sol";
-import "forge-std/console.sol";
-import "forge-std/Test.sol";
-
 import "@openzeppelin-contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-import "../../contracts/libraries/Timelock.sol";
-import "../../contracts/amb/LoremIpsumRouter.sol";
-import "../../contracts/libraries/Proxy.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/libraries/Timelock.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/amb/LoremIpsumRouter.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/libraries/Proxy.sol";
 
 contract LoremIpsumRouterTest is Test {
     function test_InitializeImplementation() public {

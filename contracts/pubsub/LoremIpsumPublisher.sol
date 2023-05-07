@@ -5,6 +5,8 @@ import "./interfaces/ISubscriptionReceiver.sol";
 
 import "../amb/LoremIpsumRouter.sol";
 
+import "../libraries/EventProof.sol";
+
 import "./PubSubStorage.sol";
 
 /// @title LoremIpsumPublisher

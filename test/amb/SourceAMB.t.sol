@@ -1,17 +1,15 @@
 pragma solidity 0.8.16;
 
-import "forge-std/Vm.sol";
-import "forge-std/console.sol";
-import "forge-std/Test.sol";
-import {WrappedInitialize} from "./TargetAMB.t.sol";
-import {LoremIpsumRouter} from "src/amb/LoremIpsumRouter.sol";
-import {SourceAMB} from "src/amb/SourceAMB.sol";
-import {UUPSProxy} from "src/libraries/Proxy.sol";
-import {Bytes32} from "src/libraries/Typecast.sol";
-import {MessageEncoding} from "src/libraries/MessageEncoding.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/amb/LoremIpsumRouter.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/amb/SourceAMB.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/libraries/Proxy.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/libraries/Typecast.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/libraries/MessageEncoding.sol";
 
-import "../../contracts/amb/LoremIpsumRouter.sol";
-import "../../contracts/libraries/Proxy.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/amb/LoremIpsumRouter.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/libraries/Proxy.sol";
+
+import "./TargetAMB.t.sol";
 
 contract SourceAMBTest is Test {
     event SentMessage(uint64 indexed nonce, bytes32 indexed msgHash, bytes message);

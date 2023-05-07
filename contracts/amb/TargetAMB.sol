@@ -3,7 +3,9 @@ pragma solidity 0.8.16;
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "./LoremIpsumStorage.sol";
+
 import "../libraries/SimpleSerialize.sol";
+import "../libraries/EventProof.sol";
 import "../libraries/Typecast.sol";
 import "../libraries/StateProofHelper.sol";
 import "../libraries/MessageEncoding.sol";

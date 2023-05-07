@@ -13,7 +13,7 @@ const ETHERSCAN_KEY = "ETHERSCAN_KEY"
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
     solidity: {
-        version: "0.8.18",
+        version: "0.8.16",
         settings: {
             optimizer: {
                 enabled: true,

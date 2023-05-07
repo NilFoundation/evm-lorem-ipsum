@@ -1,7 +1,7 @@
 pragma solidity 0.8.16;
 
-import "../../contracts/amb/interfaces/ILoremIpsum.sol";
-import "../../contracts/amb/interfaces/LoremIpsumHandler.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/amb/interfaces/ILoremIpsum.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/amb/interfaces/LoremIpsumHandler.sol";
 
 contract SourceCounter {
     ILoremIpsumRouter router;

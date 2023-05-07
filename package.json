@@ -2,21 +2,20 @@
   "name": "@nilfoundation/evm-lorem-ipsum",
   "version": "1.0.0",
   "devDependencies": {
-    "@nilfoundation/evm-placeholder-verification": "^1.0.11",
+    "@eth-optimism/contracts-bedrock": "^0.13.2",
+    "@layerzerolabs/core": "git://github.com/LayerZero-Labs/LayerZero.git#main",
+    "@nilfoundation/evm-placeholder-verification": "^1.0.12",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
     "@nomiclabs/hardhat-ethers": "^2.2.2",
-    "@layerzerolabs/core" : "git://github.com/LayerZero-Labs/LayerZero.git#main",
     "@openzeppelin/contracts": ">=4.7.2",
     "@openzeppelin/contracts-upgradeable": ">=4.7.2",
-    "@eth-optimism/contracts-bedrock": "^0.13.2",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
     "hardhat": "^2.13.0",
     "hardhat-contract-sizer": "^2.8.0",
     "hardhat-deploy": "^0.11.25",
     "hardhat-deploy-ethers": "^0.4.0-next.1",
-    "install": "^0.13.0",
-    "npm": "^9.6.4"
+    "install": "^0.13.0"
   },
   "directories": {
     "src": "contracts",
@@ -37,7 +36,5 @@
     "lossless-json": "^2.0.8",
     "tarball": "^0.0.5"
   },
-  "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts"
+  "main": "src/common.js"
 }

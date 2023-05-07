@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@layerzerolabs/core/contracts/interfaces/ILayerZeroOracleV2.sol";
 import "@layerzerolabs/core/contracts/interfaces/ILayerZeroUltraLightNodeV2.sol";
 
-import "../../contracts/oracle/LoremIpsumOracle.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/oracle/LoremIpsumOracle.sol";
 
 contract LayerZeroOracle is ILayerZeroOracleV2, Ownable, ReentrancyGuard {
     mapping(address => bool) public approvedAddresses;

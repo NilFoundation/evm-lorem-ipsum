@@ -1,6 +1,6 @@
 pragma solidity 0.8.16;
 
-import "../../contracts/amb/interfaces/ILoremIpsum.sol";
+import "@nilfoundation/evm-lorem-ipsum/contracts/amb/interfaces/ILoremIpsum.sol";
 
 contract Counter is ILoremIpsumHandler {
     uint256 public counter = 0;
