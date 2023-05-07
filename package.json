@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "devDependencies": {
     "@eth-optimism/contracts-bedrock": "^0.13.2",
-    "@layerzerolabs/core": "git://github.com/LayerZero-Labs/LayerZero.git#main",
     "@nilfoundation/evm-placeholder-verification": "^1.0.12",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
     "@nomiclabs/hardhat-ethers": "^2.2.2",

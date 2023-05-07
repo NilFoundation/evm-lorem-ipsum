@@ -58,7 +58,7 @@ library EventProof {
         RLPReader.RLPItem[] memory relevantLog = logs[_logIndex].readList();
 
         // Validate that the correct contract emitted the event
-        (uint160 result, ) = UintBytes.readUint160(relevantLog[0].readBytes(), 0);
+        (uint160 result,) = UintBytes.readUint160(relevantLog[0].readBytes(), 0);
         address sourceContract = address(result);
         require(sourceContract == _eventSource, "Event was not emitted by source contract");
 
@@ -130,7 +130,7 @@ library EventProof {
 
         // Validate that the correct contract emitted the event
         uint160 result;
-        (result, ) = UintBytes.readUint160(relevantLog[0].readBytes(), 0);
+        (result,) = UintBytes.readUint160(relevantLog[0].readBytes(), 0);
         address contractAddress = address(result);
         require(contractAddress == claimedEmitter, "Event was not emitted by claimedEmitter");
         RLPReader.RLPItem[] memory topics = relevantLog[1].readList();
