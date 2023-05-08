@@ -4,10 +4,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 import '@nilfoundation/evm-placeholder-verification/contracts/interfaces/verifier.sol';
 
-import "./interfaces/ILightClient.sol";
-
-import "./StepVerifier.sol";
-import "./RotateVerifier.sol";
+import "./interfaces/IStateProof.sol";
 
 import "../libraries/SimpleSerialize.sol";
 
@@ -23,6 +20,7 @@ import "../libraries/SimpleSerialize.sol";
         uint256 participation;
         bytes32 finalizedHeaderRoot;
         bytes32 executionStateRoot;
+
         PlaceholderProof proof;
     }
 
@@ -30,12 +28,13 @@ import "../libraries/SimpleSerialize.sol";
         LightClientStep step;
         bytes32 syncCommitteeSSZ;
         bytes32 syncCommitteePoseidon;
+
         PlaceholderProof proof;
     }
 
 /// @notice Uses Ethereum 2's Sync Committee Protocol to keep up-to-date with block headers from a
 ///         Beacon Chain. This is done in a gas-efficient manner using zero-knowledge proofs.
-contract LightClient is ILightClient, Ownable {
+contract LightClient is IStateProof, Ownable {
     bytes32 public immutable GENESIS_VALIDATORS_ROOT;
     uint256 public immutable GENESIS_TIME;
     uint256 public immutable SECONDS_PER_SLOT;
@@ -67,8 +66,8 @@ contract LightClient is ILightClient, Ownable {
     /// @notice Maps from a slot to the timestamp of when the headers mapping was updated with slot as a key
     mapping(uint256 => uint256) public timestamps;
 
-    /// @notice Maps from a slot to the current finalized ethereum1 execution state root.
-    mapping(uint256 => bytes32) public executionStateRoots;
+    /// @notice Maps from a slot to the current finalized state root.
+    mapping(uint256 => bytes32) public stateRoots;
 
     /// @notice Maps from a period to the poseidon commitment for the sync committee.
     mapping(uint256 => bytes32) public syncCommitteePoseidons;
@@ -229,8 +228,8 @@ contract LightClient is ILightClient, Ownable {
             }
             return;
         }
-        if (executionStateRoots[slot] != bytes32(0)) {
-            if (executionStateRoots[slot] != executionStateRoot) {
+        if (stateRoots[slot] != bytes32(0)) {
+            if (stateRoots[slot] != executionStateRoot) {
                 consistent = false;
             }
             return;
@@ -238,7 +237,7 @@ contract LightClient is ILightClient, Ownable {
 
         head = slot;
         headers[slot] = finalizedHeaderRoot;
-        executionStateRoots[slot] = executionStateRoot;
+        stateRoots[slot] = executionStateRoot;
         timestamps[slot] = block.timestamp;
         emit HeadUpdate(slot, finalizedHeaderRoot);
     }

@@ -2,7 +2,7 @@ pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-import "../lightclient/interfaces/ILightClient.sol";
+import "../lightclient/interfaces/IStateProof.sol";
 
 import "./LoremIpsumStorage.sol";
 import "./interfaces/ILoremIpsum.sol";
@@ -41,7 +41,7 @@ contract LoremIpsumRouter is SourceAMB, TargetAMB, LoremIpsumAccess, UUPSUpgrade
 
         sourceChainIds = _sourceChainIds;
         for (uint32 i = 0; i < sourceChainIds.length; i++) {
-            lightClients[sourceChainIds[i]] = ILightClient(_lightClients[i]);
+            lightClients[sourceChainIds[i]] = IStateProof(_lightClients[i]);
             broadcasters[sourceChainIds[i]] = _broadcasters[i];
         }
         sendingEnabled = _sendingEnabled;

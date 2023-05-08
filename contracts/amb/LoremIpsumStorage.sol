@@ -1,6 +1,6 @@
 pragma solidity 0.8.16;
 
-import "../lightclient/interfaces/ILightClient.sol";
+import "../lightclient/interfaces/IStateProof.sol";
 import "./interfaces/ILoremIpsum.sol";
 
 contract LoremIpsumStorage {
@@ -25,7 +25,7 @@ contract LoremIpsumStorage {
     uint32[] public sourceChainIds;
 
     /// @notice Mapping between source chainId and the corresponding light client.
-    mapping(uint32 => ILightClient) public lightClients;
+    mapping(uint32 => IStateProof) public lightClients;
 
     /// @notice Mapping between source chainId and the address of the Telepathy broadcaster on that chain.
     mapping(uint32 => address) public broadcasters;

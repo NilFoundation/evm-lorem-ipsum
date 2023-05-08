@@ -2,7 +2,7 @@ pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
-import "../lightclient/interfaces/ILightClient.sol";
+import "../lightclient/interfaces/IStateProof.sol";
 import "./LoremIpsumStorage.sol";
 
 contract LoremIpsumAccess is LoremIpsumStorage, AccessControlUpgradeable {
@@ -120,7 +120,7 @@ contract LoremIpsumAccess is LoremIpsumStorage, AccessControlUpgradeable {
             sourceChainIds.push(chainId);
             emit SourceChainAdded(chainId);
         }
-        lightClients[chainId] = ILightClient(lightclient);
+        lightClients[chainId] = IStateProof(lightclient);
         broadcasters[chainId] = broadcaster;
         emit SetLightClientAndBroadcaster(chainId, lightclient, broadcaster);
     }

@@ -65,7 +65,7 @@ contract TargetAMB is LoremIpsumStorage, ReentrancyGuardUpgradeable, ILoremIpsum
             // storageRoot using the provided accountProof.
             if (storageRootCache[cacheKey] == 0) {
                 bytes32 executionStateRoot =
-                lightClients[message.sourceChainId].executionStateRoots(slot);
+                lightClients[message.sourceChainId].stateRoots(slot);
                 require(executionStateRoot != 0, "Execution State Root is not set");
                 storageRoot = StorageProof.getStorageRoot(
                     accountProof, broadcasters[message.sourceChainId], executionStateRoot
