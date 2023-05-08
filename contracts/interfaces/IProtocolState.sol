@@ -1,6 +1,6 @@
 pragma solidity ^0.8.0;
 
-interface ILightClient {
+interface IProtocolState {
     function consistent() external view returns (bool);
 
     function head() external view returns (uint256);

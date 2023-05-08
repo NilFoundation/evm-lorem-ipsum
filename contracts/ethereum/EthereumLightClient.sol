@@ -4,7 +4,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 import '@nilfoundation/evm-placeholder-verification/contracts/interfaces/verifier.sol';
 
-import "./interfaces/ILightClient.sol";
+import "./interfaces/IProtocolState.sol";
 
 import "../libraries/SimpleSerialize.sol";
 
@@ -34,7 +34,7 @@ import "../libraries/SimpleSerialize.sol";
 
 /// @notice Uses Ethereum 2's Sync Committee Protocol to keep up-to-date with block headers from a
 ///         Beacon Chain. This is done in a gas-efficient manner using zero-knowledge proofs.
-contract LightClient is ILightClient, Ownable {
+contract EthereumLightClient is IProtocolState, Ownable {
     bytes32 public immutable GENESIS_VALIDATORS_ROOT;
     uint256 public immutable GENESIS_TIME;
     uint256 public immutable SECONDS_PER_SLOT;
