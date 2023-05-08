@@ -1,6 +1,6 @@
 {
   "name": "@nilfoundation/evm-lorem-ipsum",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "devDependencies": {
     "@eth-optimism/contracts-bedrock": "^0.13.2",
     "@nilfoundation/evm-placeholder-verification": "^1.0.12",
