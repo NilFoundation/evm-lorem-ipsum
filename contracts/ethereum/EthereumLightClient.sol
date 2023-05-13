@@ -4,7 +4,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 import '@nilfoundation/evm-placeholder-verification/contracts/interfaces/verifier.sol';
 
-import "./interfaces/IProtocolState.sol";
+import "../interfaces/IProtocolState.sol";
 
 import "../libraries/SimpleSerialize.sol";
 
