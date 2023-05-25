@@ -10,7 +10,7 @@ import "../../libraries/Typecast.sol";
 /// @title Telepathy Mock AMB for testing
 /// @author Succinct Labs
 /// @notice This contract is used for testing.
-contract MockLoremIpsum is ILoremIpsumRouter {
+contract MockLoremIpsum is ILoremIpsumSender {
     // All stuff related to sending
     uint32 chainId;
     uint64 sentNonce;

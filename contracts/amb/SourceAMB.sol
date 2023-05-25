@@ -10,7 +10,7 @@ import "./LoremIpsumAccess.sol";
 
 /// @title Source Arbitrary Message Bridge
 /// @notice This contract is the entrypoint for sending messages to other chains.
-contract SourceAMB is LoremIpsumStorage, ILoremIpsumRouter {
+contract SourceAMB is SenderStorage, SharedStorage, ILoremIpsumSender {
     /// @notice Modifier to require that sending is enabled.
     modifier isSendingEnabled() {
         require(sendingEnabled, "Sending is disabled");

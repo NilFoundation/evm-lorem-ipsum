@@ -14,7 +14,7 @@ import "./interfaces/ILoremIpsum.sol";
 
 /// @title Target Arbitrary Message Bridge
 /// @notice Executes messages sent from the source chain on the destination chain.
-contract TargetAMB is LoremIpsumStorage, ReentrancyGuardUpgradeable, ILoremIpsumReceiver {
+contract TargetAMB is ReceiverStorage, SharedStorage, ReentrancyGuardUpgradeable, ILoremIpsumReceiver {
     /// @notice The minimum delay for using any information from the light client.
     uint256 public constant MIN_LIGHT_CLIENT_DELAY = 2 minutes;
 

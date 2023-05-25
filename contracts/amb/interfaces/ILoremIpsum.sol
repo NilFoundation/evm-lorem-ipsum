@@ -16,7 +16,7 @@ pragma solidity ^0.8.0;
         bytes data;
     }
 
-interface ILoremIpsumRouter {
+interface ILoremIpsumSender {
     event SentMessage(uint64 indexed nonce, bytes32 indexed msgHash, bytes message);
 
     function send(uint32 destinationChainId, bytes32 destinationAddress, bytes calldata data)

@@ -5,7 +5,7 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "../interfaces/IProtocolState.sol";
 import "./LoremIpsumStorage.sol";
 
-contract LoremIpsumAccess is LoremIpsumStorage, AccessControlUpgradeable {
+contract LoremIpsumAccess is SenderStorage, ReceiverStorage, SharedStorage, AccessControlUpgradeable {
     /// @notice Emitted when the sendingEnabled flag is changed.
     event SendingEnabled(bool enabled);
 
