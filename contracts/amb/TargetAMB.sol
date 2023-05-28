@@ -18,7 +18,7 @@ contract TargetAMB is ReceiverStorage, SharedStorage, ReentrancyGuardUpgradeable
     /// @notice The minimum delay for using any information from the light client.
     uint256 public constant MIN_LIGHT_CLIENT_DELAY = 2 minutes;
 
-    /// @notice The ITelepathyBroadcaster SentMessage event signature used in `executeMessageFromLog`.
+    /// @notice SentMessage event signature used in `executeMessageFromLog`.
     bytes32 internal constant SENT_MESSAGE_EVENT_SIG =
     keccak256("SentMessage(uint64,bytes32,bytes)");
 

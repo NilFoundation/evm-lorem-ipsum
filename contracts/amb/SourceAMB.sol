@@ -40,38 +40,6 @@ contract SourceAMB is SenderStorage, SharedStorage, ILoremIpsumSender {
         return messageRoot;
     }
 
-    /// @notice Sends a message to a destination chain.
-    /// @notice This method is more expensive than the `send` method as it requires adding to
-    ///         contract storage. Use `send` when interacting with Telepathy to save gas.
-    /// @param destinationChainId The chain id that specifies the destination chain.
-    /// @param destinationAddress The contract address that will be called on the destination chain.
-    /// @param data The data passed to the contract on the other chain
-    /// @return bytes32 A unique identifier for a message.
-    function sendViaStorage(uint32 destinationChainId,
-        bytes32 destinationAddress,
-        bytes calldata data
-    ) external isSendingEnabled returns (bytes32) {
-        require(destinationChainId != block.chainid, "Cannot send to same chain");
-        (bytes memory message, bytes32 messageRoot) =
-        _getMessageAndRoot(destinationChainId, destinationAddress, data);
-        messages[nonce] = messageRoot;
-        emit SentMessage(nonce++, messageRoot, message);
-        return messageRoot;
-    }
-
-    function sendViaStorage(
-        uint32 destinationChainId,
-        address destinationAddress,
-        bytes calldata data
-    ) external isSendingEnabled returns (bytes32) {
-        require(destinationChainId != block.chainid, "Cannot send to same chain");
-        (bytes memory message, bytes32 messageRoot) =
-        _getMessageAndRoot(destinationChainId, Bytes32.fromAddress(destinationAddress), data);
-        messages[nonce] = messageRoot;
-        emit SentMessage(nonce++, messageRoot, message);
-        return messageRoot;
-    }
-
     /// @notice Gets the message and message root from the user-provided arguments to `send`
     /// @param destinationChainId The chain id that specifies the destination chain.
     /// @param destinationAddress The contract address that will be called on the destination chain.

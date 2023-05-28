@@ -43,19 +43,7 @@ contract MockLoremIpsum is ILoremIpsumSender {
     {
         return _send(_destinationChainId, Bytes32.fromAddress(_destinationAddress), _data);
     }
-
-    function sendViaStorage(uint32 _destinationChainId,
-        bytes32 _destinationAddress,
-        bytes calldata _data) external returns (bytes32) {
-        return _send(_destinationChainId, _destinationAddress, _data);
-    }
-
-    function sendViaStorage(uint32 _destinationChainId,
-        address _destinationAddress,
-        bytes calldata _data) external returns (bytes32) {
-        return _send(_destinationChainId, Bytes32.fromAddress(_destinationAddress), _data);
-    }
-
+    
     /// @dev Helper methods for processing all send methods
 
     function _send(uint32 _destinationChainId, bytes32 _destinationAddress, bytes calldata _data)

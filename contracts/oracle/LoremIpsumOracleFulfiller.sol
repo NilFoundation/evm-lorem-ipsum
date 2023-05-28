@@ -4,10 +4,10 @@ import "../amb/interfaces/ILoremIpsum.sol";
 import "./LoremIpsumOracle.sol";
 
 contract LoremIpsumOracleFulfiller {
-    ILoremIpsumRouter router;
+    ILoremIpsumSender router;
 
     constructor(address _router) {
-        router = ILoremIpsumRouter(_router);
+        router = ILoremIpsumSender(_router);
     }
 
     function fulfillCrossChainRequest(uint32 _oracleChain,

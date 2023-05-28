@@ -26,18 +26,6 @@ interface ILoremIpsumSender {
     function send(uint32 destinationChainId, address destinationAddress, bytes calldata data)
     external
     returns (bytes32);
-
-    function sendViaStorage(
-        uint32 destinationChainId,
-        bytes32 destinationAddress,
-        bytes calldata data
-    ) external returns (bytes32);
-
-    function sendViaStorage(
-        uint32 destinationChainId,
-        address destinationAddress,
-        bytes calldata data
-    ) external returns (bytes32);
 }
 
 interface ILoremIpsumReceiver {

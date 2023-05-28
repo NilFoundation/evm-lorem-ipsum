@@ -8,9 +8,6 @@ abstract contract SenderStorage {
     /// @notice Whether sending is enabled or not.
     bool public sendingEnabled;
 
-    /// @notice Mapping between a nonce and a message root.
-    mapping(uint64 => bytes32) public messages;
-
     /// @notice Keeps track of the next nonce to be used.
     uint64 public nonce;
 

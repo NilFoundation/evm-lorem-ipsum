@@ -27,6 +27,7 @@ module.exports = {
     networks: {
         hardhat: {
             blockGasLimit: 100_000_000,
+            chainId: 100,
         },
         // sepolia: {
         //   url: `https://eth-sepolia.g.alchemy.com/v2/${SEPOLIA_ALCHEMY_KEY}`,
