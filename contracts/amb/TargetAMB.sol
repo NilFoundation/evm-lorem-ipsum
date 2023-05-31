@@ -88,58 +88,6 @@ contract TargetAMB is ReceiverStorage, SharedStorage, ReentrancyGuardUpgradeable
         _executeMessage(message, messageRoot, messageBytes);
     }
 
-    /// @notice Executes a message given an event proof.
-    /// @param srcSlotTxSlotPack The slot where we want to read the header from and the slot where
-    ///                          the tx executed, packed as two uint64s.
-    /// @param messageBytes The message we want to execute provided as bytes.
-    /// @param receiptsRootProof A merkle proof proving the receiptsRoot in the block header.
-    /// @param receiptsRoot The receipts root which contains our "SentMessage" event.
-    /// @param txIndexRLPEncoded The index of our transaction inside the block RLP encoded.
-    /// @param logIndex The index of the event in our transaction.
-    function executeMessageFromLog(
-        bytes calldata srcSlotTxSlotPack,
-        bytes calldata messageBytes,
-        bytes32[] calldata receiptsRootProof,
-        bytes32 receiptsRoot,
-        bytes[] calldata receiptProof,
-        bytes memory txIndexRLPEncoded,
-        uint256 logIndex
-    ) external nonReentrant {
-        // Verify receiptsRoot against header from light client
-        (Message memory message, bytes32 messageRoot) = _checkPreconditions(messageBytes);
-        requireLightClientConsistency(message.sourceChainId);
-        requireNotFrozen(message.sourceChainId);
-
-        {
-            (uint64 srcSlot, uint64 txSlot) = abi.decode(srcSlotTxSlotPack, (uint64, uint64));
-            requireLightClientDelay(srcSlot, message.sourceChainId);
-            bytes32 headerRoot = lightClients[message.sourceChainId].headers(srcSlot);
-            require(headerRoot != bytes32(0), "HeaderRoot is missing");
-            bool isValid =
-            SSZ.verifyReceiptsRoot(receiptsRoot, receiptsRootProof, headerRoot, srcSlot, txSlot);
-            require(isValid, "Invalid receipts root proof");
-        }
-
-        {
-            // TODO maybe we can save calldata by passing in the txIndex as a uint and rlp encode it
-            // to derive txIndexRLPEncoded instead of passing in `bytes memory txIndexRLPEncoded`
-            bytes32 receiptMessageRoot = bytes32(
-                EventProof.getEventTopic(
-                    receiptProof,
-                    receiptsRoot,
-                    txIndexRLPEncoded,
-                    logIndex,
-                    broadcasters[message.sourceChainId],
-                    SENT_MESSAGE_EVENT_SIG,
-                    MSG_HASH_TOPIC_IDX
-                )
-            );
-            require(receiptMessageRoot == messageRoot, "Invalid message hash.");
-        }
-
-        _executeMessage(message, messageRoot, messageBytes);
-    }
-
     /// @notice Checks that the light client for a given chainId is consistent.
     function requireLightClientConsistency(uint32 chainId) internal view {
         require(address(lightClients[chainId]) != address(0), "Light client is not set.");
