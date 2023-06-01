@@ -42,14 +42,6 @@ interface ILoremIpsumReceiver {
         bytes[] calldata accountProof,
         bytes[] calldata storageProof) external;
 
-    function executeMessageFromLog(
-        bytes calldata srcSlotTxSlotPack,
-        bytes calldata messageBytes,
-        bytes32[] calldata receiptsRootProof,
-        bytes32 receiptsRoot,
-        bytes[] calldata receiptProof, // receipt proof against receipt root
-        bytes memory txIndexRLPEncoded,
-        uint256 logIndex) external;
 }
 
 interface ILoremIpsumHandler {
