@@ -7,6 +7,7 @@ import "../libraries/Typecast.sol";
 import "../libraries/MessageEncoding.sol";
 import "./interfaces/ILoremIpsum.sol";
 import "./LoremIpsumAccess.sol";
+import "../libraries/Typecast.sol";
 
 /// @title Source Arbitrary Message Bridge
 /// @notice This contract is the entrypoint for sending messages to other chains.
@@ -24,19 +25,39 @@ contract SourceAMB is SenderStorage, SharedStorage, ILoremIpsumSender {
     /// @return bytes32 A unique identifier for a message.
     function send(uint32 destinationChainId, bytes32 destinationAddress, bytes calldata data)
     external isSendingEnabled returns (bytes32) {
-        require(destinationChainId != block.chainid, "Cannot send to same chain");
+
+        //require(destinationChainId != block.chainid, "Cannot send to same chain");
         (bytes memory message, bytes32 messageRoot) =
         _getMessageAndRoot(destinationChainId, destinationAddress, data);
-        emit SentMessage(nonce++, messageRoot, message);
+        
+        Message memory crossChainMessage = Message(version,
+            nonce,
+            uint32(block.chainid),
+            msg.sender,
+            destinationChainId,
+            destinationAddress,
+            data);
+
+        emit SentMessage(abi.encode(crossChainMessage));
         return messageRoot;
     }
 
     function send(uint32 destinationChainId, address destinationAddress, bytes calldata data)
     external isSendingEnabled returns (bytes32) {
-        require(destinationChainId != block.chainid, "Cannot send to same chain");
+
+        //require(destinationChainId != block.chainid, "Cannot send to same chain");
         (bytes memory message, bytes32 messageRoot) =
         _getMessageAndRoot(destinationChainId, Bytes32.fromAddress(destinationAddress), data);
-        emit SentMessage(nonce++, messageRoot, message);
+        
+        Message memory crossChainMessage = Message(version,
+            nonce,
+            uint32(block.chainid),
+            msg.sender,
+            destinationChainId,
+            Bytes32.fromAddress(destinationAddress),
+            data);
+
+        emit SentMessage(abi.encode(crossChainMessage));
         return messageRoot;
     }
 
@@ -51,7 +72,7 @@ contract SourceAMB is SenderStorage, SharedStorage, ILoremIpsumSender {
         bytes32 destinationAddress,
         bytes calldata data
     ) internal view returns (bytes memory messageBytes, bytes32 messageRoot) {
-        messageBytes = MessageEncoding.encode(
+        messageBytes = abi.encode(
             version,
             nonce,
             uint32(block.chainid),

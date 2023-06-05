@@ -2,6 +2,7 @@ require("@nomicfoundation/hardhat-toolbox");
 require("@nomiclabs/hardhat-ethers");
 require("hardhat-deploy");
 require('hardhat-deploy-ethers')
+require('@openzeppelin/hardhat-upgrades');
 require("hardhat-contract-sizer");
 
 import './tasks/verify_mina_proof'

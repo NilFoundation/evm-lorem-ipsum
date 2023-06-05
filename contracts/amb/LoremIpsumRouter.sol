@@ -45,7 +45,7 @@ contract LoremIpsumRouter is SourceAMB, TargetAMB, LoremIpsumAccess, UUPSUpgrade
             broadcasters[sourceChainIds[i]] = _broadcasters[i];
         }
         sendingEnabled = _sendingEnabled;
-        version = VERSION;
+        version = 0x43;
     }
 
     /// @notice Authorizes an upgrade for the implementation contract.

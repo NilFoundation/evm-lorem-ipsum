@@ -38,80 +38,32 @@ contract TargetAMB is ReceiverStorage, SharedStorage, ReentrancyGuardUpgradeable
         return sourceChainIds.length;
     }
 
-    /// @notice Executes a message given a storage proof.
-    /// @param slot Specifies which execution state root should be read from the light client.
-    /// @param messageBytes The message we want to execute provided as bytes.
-    /// @param accountProof Used to prove the broadcaster's state root.
-    /// @param storageProof Used to prove the existence of the message root inside the broadcaster.
-    function executeMessage(
-        uint64 slot,
-        bytes calldata messageBytes,
-        bytes[] calldata accountProof,
-        bytes[] calldata storageProof
-    ) external nonReentrant {
-        (Message memory message, bytes32 messageRoot) = _checkPreconditions(messageBytes);
-        requireLightClientConsistency(message.sourceChainId);
-        requireNotFrozen(message.sourceChainId);
+    function executeMessage(bytes calldata messageBytes, address _transitionManager) external nonReentrant {
 
-        {
-            requireLightClientDelay(slot, message.sourceChainId);
+        Message memory message = abi.decode(messageBytes, (Message));
+        //requireNotFrozen(message.sourceChainId);
 
-            bytes32 storageRoot;
-            bytes32 cacheKey = keccak256(
-                abi.encodePacked(message.sourceChainId, slot, broadcasters[message.sourceChainId])
-            );
-
-            // If the cache is empty for the cacheKey, then we get the
-            // storageRoot using the provided accountProof.
-            if (storageRootCache[cacheKey] == 0) {
-                bytes32 executionStateRoot =
-                lightClients[message.sourceChainId].stateRoots(slot);
-                require(executionStateRoot != 0, "Execution State Root is not set");
-                storageRoot = StorageProof.getStorageRoot(
-                    accountProof, broadcasters[message.sourceChainId], executionStateRoot
-                );
-                storageRootCache[cacheKey] = storageRoot;
-            } else {
-                storageRoot = storageRootCache[cacheKey];
-            }
-
-            bytes32 slotKey = keccak256(
-                abi.encode(keccak256(abi.encode(message.nonce, MESSAGES_MAPPING_STORAGE_INDEX)))
-            );
-            uint256 slotValue = StorageProof.getStorageValue(slotKey, storageRoot, storageProof);
-
-            if (bytes32(slotValue) != messageRoot) {
-                revert("Invalid message hash.");
-            }
-        }
-
-        _executeMessage(message, messageRoot, messageBytes);
-    }
-
-    /// @notice Checks that the light client for a given chainId is consistent.
-    function requireLightClientConsistency(uint32 chainId) internal view {
-        require(address(lightClients[chainId]) != address(0), "Light client is not set.");
-        require(lightClients[chainId].consistent(), "Light client is inconsistent.");
+        IExecuteMessageTransitionHandler(_transitionManager).
+        processExecuteMessageCrossChain(
+            message.nonce,
+            message.sourceChainId,
+            message.sourceAddress,
+            message.destinationChainId,
+            Address.fromBytes32(message.destinationAddress),
+            message.data
+        );
+        
     }
 
     /// @notice Checks that the chainId is not frozen.
     function requireNotFrozen(uint32 chainId) internal view {
         require(!frozen[chainId], "Contract is frozen.");
     }
-
-    /// @notice Checks that the light client delay is adequate.
-    function requireLightClientDelay(uint64 slot, uint32 chainId) internal view {
-        require(address(lightClients[chainId]) != address(0), "Light client is not set.");
-        require(lightClients[chainId].timestamps(slot) != 0, "Timestamp is not set for slot.");
-        uint256 elapsedTime = block.timestamp - lightClients[chainId].timestamps(slot);
-        require(elapsedTime >= MIN_LIGHT_CLIENT_DELAY, "Must wait longer to use this slot.");
-    }
-
     /// @notice Decodes the message from messageBytes and checks conditions before message execution
     /// @param messageBytes The message we want to execute provided as bytes.
+
     function _checkPreconditions(bytes calldata messageBytes)
     internal
-    view
     returns (Message memory, bytes32)
     {
         Message memory message = MessageEncoding.decode(messageBytes);
@@ -130,48 +82,5 @@ contract TargetAMB is ReceiverStorage, SharedStorage, ReentrancyGuardUpgradeable
             revert("Light client or broadcaster for source chain is not set");
         }
         return (message, messageRoot);
-    }
-
-    /// @notice Executes a message and updates storage with status and emits an event.
-    /// @dev Assumes that the message is valid and has not been already executed.
-    /// @dev Assumes that message, messageRoot and messageBytes have already been validated.
-    /// @param message The message we want to execute.
-    /// @param messageRoot The message root of the message.
-    /// @param messageBytes The message we want to execute provided as bytes for use in the event.
-    function _executeMessage(Message memory message, bytes32 messageRoot, bytes memory messageBytes)
-    internal
-    {
-        bool status;
-        bytes memory data;
-        {
-            bytes memory receiveCall = abi.encodeWithSelector(
-                ILoremIpsumHandler.handleMessage.selector,
-                message.sourceChainId,
-                message.sourceAddress,
-                message.data
-            );
-            address destination = Address.fromBytes32(message.destinationAddress);
-            (status, data) = destination.call(receiveCall);
-        }
-
-        // Unfortunately, there are some edge cases where a call may have a successful status but
-        // not have actually called the handler. Thus, we enforce that the handler must return
-        // a magic constant that we can check here. To avoid stack underflow / decoding errors, we
-        // only decode the returned bytes if one EVM word was returned by the call.
-        bool implementsHandler = false;
-        if (data.length == 32) {
-            (bytes4 magic) = abi.decode(data, (bytes4));
-            implementsHandler = magic == ILoremIpsumHandler.handleMessage.selector;
-        }
-
-        if (status && implementsHandler) {
-            messageStatus[messageRoot] = MessageStatus.EXECUTION_SUCCEEDED;
-        } else {
-            messageStatus[messageRoot] = MessageStatus.EXECUTION_FAILED;
-        }
-
-        emit ExecutedMessage(
-            message.sourceChainId, message.nonce, messageRoot, messageBytes, status
-        );
     }
 }
