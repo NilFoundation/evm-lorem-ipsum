@@ -97,7 +97,7 @@ contract LoremIpsumOracle is AccessControl, ILoremIpsumResonseHandler {
         bytes calldata _targetData
     ) external returns (uint256 nonce) {
 
-        require(_destinationChainId == chainId, "Can not send to the same chain!");
+        require(_destinationChainId != chainId, "Can not send to the same chain!");
 
         unchecked {
             ++nonceNext;
@@ -130,18 +130,24 @@ contract LoremIpsumOracle is AccessControl, ILoremIpsumResonseHandler {
         address _targetContract,
         bytes calldata _targetData,
         uint256 _nonce,
-        uint8 _proofsRequest
+        bytes memory _proof,
+        uint256 _proofVerificationTypeId
         ) external returns (bytes32) {
 
-            require(_destinationChainId == chainId, "Can not send to the same chain!");
+            //require(_destinationChainId != chainId, "Can not send to the same chain!");
 
+            if (_nonce == 0) {
+                unchecked {
+                    ++nonceNext;
+                }
+                _nonce = nonceNext;
+            }
             SendRequestData memory requestData = SendRequestData(_nonce, msg.sender, _destinationChainId, _targetContract, _targetData);
             bytes32 requestHash = keccak256(abi.encode(requestData));
             bytes32 hashRoot = transitionManager.processSendRequestCrossChain(
-                    _destinationChainId, _targetContract, _targetData, _proofsRequest);
+                    _destinationChainId, _targetContract, _targetData, _proof, _proofVerificationTypeId);
 
             emit CrossChainRequestSent(_nonce, hashRoot, msg.sender, _destinationChainId, _targetContract, _targetData);
-
             requests[requestHash] = RequestStatus.FINISHED;
 
             return hashRoot;

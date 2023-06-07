@@ -1,12 +1,14 @@
 import "../amb/interfaces/ILoremIpsum.sol";
 import "./LoremIpsumOracle.sol";
+import "../interfaces/IProofHandler.sol";
 
 contract LoremIpsumTransitionsManager is IExecuteMessageTransitionHandler {
 
+    mapping(bytes32 => address) proofVerificationHandlers;
+
     struct TransitionStorage {
-        uint8 proofTypeRequest;
-        bytes accountProof;
-        bytes stateProof;
+        uint256 proofVerificationTypeId;
+        bytes proof;
         bytes targetData;
     }
 
@@ -22,24 +24,43 @@ contract LoremIpsumTransitionsManager is IExecuteMessageTransitionHandler {
         oracle = LoremIpsumOracle(_oracle);
     }
 
+    function setVerifierHandler(uint32 _sourceChainId, uint256 _proofVerificationTypeId, address _verifier) public {
+        bytes32 proofHandlerId = keccak256(abi.encode(_sourceChainId, _proofVerificationTypeId));
+
+        proofVerificationHandlers[proofHandlerId] = _verifier;
+    }
+
+    function processTransitionStorageMessage(uint32 _sourceChainId, TransitionStorage memory _transitionStorage) internal {
+        
+        bytes32 proofHandlerId = keccak256(abi.encode(_sourceChainId, _transitionStorage.proofVerificationTypeId));
+        bool status;
+
+        require(proofVerificationHandlers[proofHandlerId] != address(0), "processTransitionStorageMessage: Handler is not exist!");
+
+        {
+            bytes memory handlerInputData = abi.encodeWithSelector(
+                IProofHandler.verifyProof.selector,
+                _transitionStorage.proof
+            );
+            (status,) = proofVerificationHandlers[proofHandlerId].call(handlerInputData);
+        }
+
+        require(status, "processTransitionStorageMessage call fail");
+
+    }
+ 
     function processSendRequestCrossChain(        
         uint32 _destinationChainId,
         address _targetContract,
         bytes calldata _targetData,
-        uint8 _proofTypeRequest) public returns (bytes32) {
+        bytes memory _proof,
+        uint256 _proofVerificationTypeId) public returns (bytes32) {
 
         TransitionStorage memory transitionStorage;
         
+        transitionStorage.proof = _proof;
         transitionStorage.targetData = _targetData;
-
-        if (_proofTypeRequest & 0x1 != 0) {
-            transitionStorage.accountProof = _requestAccountProof();
-        }
-        if (_proofTypeRequest & 0x2 != 0) {
-            transitionStorage.stateProof = _requestStateProof();
-        }
-
-        transitionStorage.proofTypeRequest = _proofTypeRequest & 0x3;
+        transitionStorage.proofVerificationTypeId = _proofVerificationTypeId;
 
         return sender.send(_destinationChainId, _targetContract, abi.encode(transitionStorage));
 
@@ -56,31 +77,9 @@ contract LoremIpsumTransitionsManager is IExecuteMessageTransitionHandler {
 
         TransitionStorage memory transitionStorage = abi.decode(_transitionStorageRawData, (TransitionStorage));
 
-        if (transitionStorage.proofTypeRequest & 0x1 != 0) {
-            require(_verifyAccountProof(transitionStorage.accountProof), "Account proof verification fail");
-        }
-
-        if (transitionStorage.proofTypeRequest & 0x2 != 0) {
-            require(_verifyStateProof(transitionStorage.stateProof), "State proof verification fail");
-        }
+        processTransitionStorageMessage(_sourceChainId, transitionStorage);
 
         oracle.handleRequest(_sourceAddress, _sourceChainId, _destinationAddress, transitionStorage.targetData);
     }
 
-
-    function _requestAccountProof() private returns(bytes memory) {
-        return abi.encode("AccountProof");
-    }
- 
-    function _requestStateProof() private returns(bytes memory) {
-        return abi.encode("StateProof");
-    }
-
-    function _verifyAccountProof(bytes memory _accountProof) private returns(bool) {
-        return (keccak256(abi.encode("AccountProof")) == keccak256(_accountProof));
-    }
-
-    function _verifyStateProof(bytes memory _stateProof) private returns(bool) {
-        return (keccak256(abi.encode("StateProof")) == keccak256(_stateProof));
-    }
 }

@@ -40,8 +40,12 @@ contract TargetAMB is ReceiverStorage, SharedStorage, ReentrancyGuardUpgradeable
 
     function executeMessage(bytes calldata messageBytes, address _transitionManager) external nonReentrant {
 
-        Message memory message = abi.decode(messageBytes, (Message));
-        //requireNotFrozen(message.sourceChainId);
+        Message memory message;
+        bytes32 messageRoot;
+
+        (message, messageRoot) = _checkPreconditions(messageBytes);
+        requireNotFrozen(message.sourceChainId);
+
 
         IExecuteMessageTransitionHandler(_transitionManager).
         processExecuteMessageCrossChain(
@@ -61,26 +65,19 @@ contract TargetAMB is ReceiverStorage, SharedStorage, ReentrancyGuardUpgradeable
     }
     /// @notice Decodes the message from messageBytes and checks conditions before message execution
     /// @param messageBytes The message we want to execute provided as bytes.
-
     function _checkPreconditions(bytes calldata messageBytes)
     internal
     returns (Message memory, bytes32)
     {
-        Message memory message = MessageEncoding.decode(messageBytes);
+        Message memory message = abi.decode(messageBytes, (Message));
         bytes32 messageRoot = keccak256(messageBytes);
-
         if (messageStatus[messageRoot] != MessageStatus.NOT_EXECUTED) {
             revert("Message already executed.");
         } else if (message.destinationChainId != block.chainid) {
             revert("Wrong chain.");
         } else if (message.version != version) {
             revert("Wrong version.");
-        } else if (
-            address(lightClients[message.sourceChainId]) == address(0)
-            || broadcasters[message.sourceChainId] == address(0)
-        ) {
-            revert("Light client or broadcaster for source chain is not set");
-        }
+        } 
         return (message, messageRoot);
     }
 }

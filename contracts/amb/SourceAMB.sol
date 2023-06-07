@@ -44,7 +44,6 @@ contract SourceAMB is SenderStorage, SharedStorage, ILoremIpsumSender {
 
     function send(uint32 destinationChainId, address destinationAddress, bytes calldata data)
     external isSendingEnabled returns (bytes32) {
-
         //require(destinationChainId != block.chainid, "Cannot send to same chain");
         (bytes memory message, bytes32 messageRoot) =
         _getMessageAndRoot(destinationChainId, Bytes32.fromAddress(destinationAddress), data);
