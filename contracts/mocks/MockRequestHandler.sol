@@ -6,13 +6,13 @@ import "../interfaces/IProtocolState.sol";
 
 contract MockRequestHandler is ILoremIpsumRequestHandler {
 
-    event OK(uint32 some_random_succes_code);
-    
     MockEthereumLightClient lightClient;
     constructor(address _lightClient) {
         lightClient = MockEthereumLightClient(_lightClient);
     }
 
+    ///@notice -- target chain request handle function. If any data is incorrect
+    /// there will be a revert called and test failed
     function handleRequestMessage(
         uint32 _sourceChainId, 
         address _sourceAddress, 

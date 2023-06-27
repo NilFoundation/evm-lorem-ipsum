@@ -2,7 +2,7 @@ pragma solidity 0.8.16;
 
 import "../interfaces/IProtocolState.sol";
 
-
+///@notice -- Ethereum Light Client mock. Used for end2end tests
 contract MockEthereumLightClient is IProtocolState {
 
     struct EthereumLightClientState {
@@ -35,7 +35,9 @@ contract MockEthereumLightClient is IProtocolState {
         chainStorage[topSlot] = newState;
     }
 
-    function makeTestState(uint256 _slot) public pure returns (bytes memory) {
+    ///@notice -- function is used to simplify raw data encoding. The function 
+    /// is called from the test environment. Not used in internal code
+    function makeTestState(uint256 _slot) external pure returns (bytes memory) {
         EthereumLightClientState memory state;
         
         state.headers = keccak256(abi.encode("headers", _slot));

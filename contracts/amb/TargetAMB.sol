@@ -46,7 +46,6 @@ contract TargetAMB is ReceiverStorage, SharedStorage, ReentrancyGuardUpgradeable
         (message, messageRoot) = _checkPreconditions(messageBytes);
         requireNotFrozen(message.sourceChainId);
 
-
         IExecuteMessageTransitionHandler(_transitionManager).
         processExecuteMessageCrossChain(
             message.nonce,

@@ -18,15 +18,42 @@ contract SourceAMB is SenderStorage, SharedStorage, ILoremIpsumSender {
         _;
     }
 
-    /// @notice Sends a message to a destination chain.
+    /// @notice Sends (proxy) a message to a destination chain.
     /// @param destinationChainId The chain id that specifies the destination chain.
     /// @param destinationAddress The contract address that will be called on the destination chain.
     /// @param data The data passed to the contract on the other chain
     /// @return bytes32 A unique identifier for a message.
     function send(uint32 destinationChainId, bytes32 destinationAddress, bytes calldata data)
-    external isSendingEnabled returns (bytes32) {
+    public isSendingEnabled returns (bytes32) {
+        return _send(destinationChainId, destinationAddress, data);
+    }
 
+    /// @notice Sends (proxy) a message to a destination chain.
+    /// @param destinationChainId The chain id that specifies the destination chain.
+    /// @param destinationAddress The contract address that will be called on the destination chain.
+    /// @param data The data passed to the contract on the other chain
+    /// @return bytes32 A unique identifier for a message.
+    function send(uint32 destinationChainId, address destinationAddress, bytes calldata data)
+    external isSendingEnabled returns (bytes32) {
+        return _send(destinationChainId, Bytes32.fromAddress(destinationAddress), data);
+    }
+
+    /// @notice Sends (implementation) a message to a destination chain.
+    /// @param destinationChainId The chain id that specifies the destination chain.
+    /// @param destinationAddress The contract address that will be called on the destination chain.
+    /// @param data The data passed to the contract on the other chain
+    /// @return bytes32 A unique identifier for a message.
+    function _send(uint32 destinationChainId, bytes32 destinationAddress, bytes calldata data)
+    private returns (bytes32) {
+        /* 
+            Current tests are working on the same chain, so it is commented for now 
+        */
         //require(destinationChainId != block.chainid, "Cannot send to same chain");
+
+        /* 
+            Current message encoding is simplified but it must be done in a smarter way
+            later on like it is done in _getMessageAndRoot -- now it is not actually used
+        */
         (bytes memory message, bytes32 messageRoot) =
         _getMessageAndRoot(destinationChainId, destinationAddress, data);
         
@@ -36,24 +63,6 @@ contract SourceAMB is SenderStorage, SharedStorage, ILoremIpsumSender {
             msg.sender,
             destinationChainId,
             destinationAddress,
-            data);
-
-        emit SentMessage(abi.encode(crossChainMessage));
-        return messageRoot;
-    }
-
-    function send(uint32 destinationChainId, address destinationAddress, bytes calldata data)
-    external isSendingEnabled returns (bytes32) {
-        //require(destinationChainId != block.chainid, "Cannot send to same chain");
-        (bytes memory message, bytes32 messageRoot) =
-        _getMessageAndRoot(destinationChainId, Bytes32.fromAddress(destinationAddress), data);
-        
-        Message memory crossChainMessage = Message(version,
-            nonce,
-            uint32(block.chainid),
-            msg.sender,
-            destinationChainId,
-            Bytes32.fromAddress(destinationAddress),
             data);
 
         emit SentMessage(abi.encode(crossChainMessage));

@@ -13,7 +13,12 @@ On the picture below is the overall design of the contracts:
 ![design](./figures/LoremIpsum.jpg)
 ----------------------------
 ### How to
-When all needed tools are installed make sure you have SSH token for GitHub and the use:
+When all needed tools are installed:
+- npm >= 8.19.0
+- hardhat >= 2.14.0
+- node >= 16.20.0
+
+Make sure you have SSH token for GitHub and the use:
 ```
 git clone git@github.com:NilFoundation/evm-lorem-ipsum.git --recursive
 cd evm-lorem-ipsum
