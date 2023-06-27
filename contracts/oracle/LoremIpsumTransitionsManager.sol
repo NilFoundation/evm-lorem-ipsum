@@ -40,7 +40,8 @@ contract LoremIpsumTransitionsManager is IExecuteMessageTransitionHandler {
         {
             bytes memory handlerInputData = abi.encodeWithSelector(
                 IProofHandler.verifyProof.selector,
-                _transitionStorage.proof
+                _transitionStorage.proof,
+                _transitionStorage.proof // here must be public input
             );
             (status,) = proofVerificationHandlers[proofHandlerId].call(handlerInputData);
         }
