@@ -2,6 +2,7 @@ require("@nomicfoundation/hardhat-toolbox");
 require("@nomiclabs/hardhat-ethers");
 require("hardhat-deploy");
 require('hardhat-deploy-ethers')
+require('@openzeppelin/hardhat-upgrades');
 require("hardhat-contract-sizer");
 
 import './tasks/verify_mina_proof'
@@ -27,6 +28,7 @@ module.exports = {
     networks: {
         hardhat: {
             blockGasLimit: 100_000_000,
+            chainId: 100,
         },
         // sepolia: {
         //   url: `https://eth-sepolia.g.alchemy.com/v2/${SEPOLIA_ALCHEMY_KEY}`,
