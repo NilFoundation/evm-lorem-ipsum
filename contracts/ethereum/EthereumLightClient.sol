@@ -6,35 +6,27 @@ import '@nilfoundation/evm-placeholder-verification/contracts/interfaces/verifie
 
 import "../interfaces/IProtocolState.sol";
 
+import "../interfaces/IZKLightClient.sol";
+
 import "../libraries/SimpleSerialize.sol";
 
-    struct PlaceholderProof {
-        bytes blob;
-        uint256[] init_params;
-        int256[][] columns_rotations;
-    }
+struct PlaceholderProof {
+    bytes blob;
+    uint256[] init_params;
+    int256[][] columns_rotations;
+}
 
-    struct LightClientStep {
-        uint256 attestedSlot;
-        uint256 finalizedSlot;
-        uint256 participation;
-        bytes32 finalizedHeaderRoot;
-        bytes32 executionStateRoot;
+struct LightClientRotate {
+    LightClientUpdate step;
+    bytes32 syncCommitteeSSZ;
+    bytes32 syncCommitteePoseidon;
 
-        PlaceholderProof proof;
-    }
-
-    struct LightClientRotate {
-        LightClientStep step;
-        bytes32 syncCommitteeSSZ;
-        bytes32 syncCommitteePoseidon;
-
-        PlaceholderProof proof;
-    }
+    PlaceholderProof proof;
+}
 
 /// @notice Uses Ethereum 2's Sync Committee Protocol to keep up-to-date with block headers from a
 ///         Beacon Chain. This is done in a gas-efficient manner using zero-knowledge proofs.
-contract EthereumLightClient is IProtocolState, Ownable {
+contract EthereumLightClient is IProtocolState, Ownable, IZKLightClient {
     bytes32 public immutable GENESIS_VALIDATORS_ROOT;
     uint256 public immutable GENESIS_TIME;
     uint256 public immutable SECONDS_PER_SLOT;
@@ -117,7 +109,7 @@ contract EthereumLightClient is IProtocolState, Ownable {
     ///      1) Enough signatures from the current sync committee for n=512
     ///      2) A valid finality proof
     ///      3) A valid execution state root proof
-    function step(LightClientStep calldata update) external {
+    function step(LightClientUpdate calldata update) external {
         bool finalized = processStep(update);
 
         if (getCurrentSlot() < update.attestedSlot) {
@@ -138,7 +130,7 @@ contract EthereumLightClient is IProtocolState, Ownable {
     /// @notice Sets the sync committee for the next sync committeee period.
     /// @dev A commitment to the the next sync committeee is signed by the current sync committee.
     function rotate(LightClientRotate calldata update) external {
-        LightClientStep memory stepUpdate = update.step;
+        LightClientUpdate memory stepUpdate = update.step;
         bool finalized = processStep(update.step);
         uint256 currentPeriod = getSyncCommitteePeriod(stepUpdate.finalizedSlot);
         uint256 nextPeriod = currentPeriod + 1;
@@ -151,7 +143,7 @@ contract EthereumLightClient is IProtocolState, Ownable {
     }
 
     /// @notice Verifies that the header has enough signatures for finality.
-    function processStep(LightClientStep calldata update) internal view returns (bool) {
+    function processStep(LightClientUpdate calldata update) internal view returns (bool) {
         uint256 currentPeriod = getSyncCommitteePeriod(update.attestedSlot);
 
         if (syncCommitteePoseidons[currentPeriod] == 0) {
@@ -160,13 +152,13 @@ contract EthereumLightClient is IProtocolState, Ownable {
             revert("Less than MIN_SYNC_COMMITTEE_PARTICIPANTS signed.");
         }
 
-        zkLightClientStep(update);
+        zkLightClientUpdate(update);
 
         return update.participation > FINALITY_THRESHOLD;
     }
 
     /// @notice Serializes the public inputs into a compressed form and verifies the step proof.
-    function zkLightClientStep(LightClientStep calldata update) internal view {
+    function zkLightClientUpdate(LightClientUpdate calldata update) internal view {
         bytes32 attestedSlotLE = SSZ.toLittleEndian(update.attestedSlot);
         bytes32 finalizedSlotLE = SSZ.toLittleEndian(update.finalizedSlot);
         bytes32 participationLE = SSZ.toLittleEndian(update.participation);
@@ -182,7 +174,7 @@ contract EthereumLightClient is IProtocolState, Ownable {
         uint256 t = uint256(SSZ.toLittleEndian(uint256(h)));
         t = t & ((uint256(1) << 253) - 1);
 
-        PlaceholderProof memory proof = update.proof;
+        PlaceholderProof memory proof = abi.decode(update.proof, (PlaceholderProof));
         uint256[1] memory inputs = [uint256(t)];
         require(IVerifier(verifier).verify(proof.blob, proof.init_params, proof.columns_rotations, stepGate));
     }
