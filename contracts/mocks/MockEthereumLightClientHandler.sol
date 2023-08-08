@@ -6,7 +6,7 @@ import "../ethereum/EthereumLightClient.sol";
 
 contract MockEthereumLightClientHandler is IProofHandler {
     
-    function verifyProof(bytes calldata proofSourceBytes, bytes calldata publicInput) public pure {
+    function verify(bytes calldata proofSourceBytes, uint256[] calldata publicInput) public pure {
         require(keccak256(proofSourceBytes) == keccak256("someStrongZKProof"), "Proof verification fail!");
     }
 
