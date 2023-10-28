@@ -96,12 +96,24 @@ contract EthereumLightClient is IProtocolState, Ownable, IZKLightClient {
         verifier = v;
     }
 
+    function getVerifier() external view returns (address) {
+        return verifier;
+    }
+
     function setRotateGate(address gateArgument) external onlyOwner {
         rotateGate = gateArgument;
     }
 
+    function getRotateGate() external view returns (address) {
+        return rotateGate;
+    }
+
     function setStepGate(address gateArgument) external onlyOwner {
         stepGate = gateArgument;
+    }
+
+    function getStepGate() external view returns (address) {
+        return stepGate;
     }
 
     /// @notice Updates the head of the light client to the provided slot.
@@ -231,8 +243,9 @@ contract EthereumLightClient is IProtocolState, Ownable, IZKLightClient {
         }
 
         head = slot;
-        headers[slot] = finalizedHeaderRoot;
-        stateRoots[slot] = executionStateRoot;
+        // TODO: commented out for now to be able to submit a proof several times
+        // headers[slot] = finalizedHeaderRoot;
+        // stateRoots[slot] = executionStateRoot;
         timestamps[slot] = block.timestamp;
         emit HeadUpdate(slot, finalizedHeaderRoot);
     }
