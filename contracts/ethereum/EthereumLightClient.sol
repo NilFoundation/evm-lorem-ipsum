@@ -1,11 +1,10 @@
-pragma solidity 0.8.16;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import '@nilfoundation/evm-placeholder-verification/contracts/interfaces/verifier.sol';
 
 import "../interfaces/IProtocolState.sol";
-
 import "../interfaces/IZKLightClient.sol";
 
 import "../libraries/SimpleSerialize.sol";
@@ -67,7 +66,8 @@ contract EthereumLightClient is IProtocolState, Ownable, IZKLightClient {
     event HeadUpdate(uint256 indexed slot, bytes32 indexed root);
     event SyncCommitteeUpdate(uint256 indexed period, bytes32 indexed root);
 
-    constructor(address placeholderVerifier,
+    constructor(
+        address placeholderVerifier,
         address step,
         address rotate,
         bytes32 genesisValidatorsRoot,
@@ -112,7 +112,7 @@ contract EthereumLightClient is IProtocolState, Ownable, IZKLightClient {
     function step(LightClientUpdate calldata update) external {
         bool finalized = true;
         
-        //finalized = processStep(update);
+        finalized = processStep(update);
 
         if (getCurrentSlot() < update.attestedSlot) {
             revert("Update slot is too far in the future");
@@ -176,9 +176,10 @@ contract EthereumLightClient is IProtocolState, Ownable, IZKLightClient {
         uint256 t = uint256(SSZ.toLittleEndian(uint256(h)));
         t = t & ((uint256(1) << 253) - 1);
 
-        PlaceholderProof memory proof = abi.decode(update.proof, (PlaceholderProof));
         uint256[1] memory inputs = [uint256(t)];
-        require(IVerifier(verifier).verify(proof.blob, proof.init_params, proof.columns_rotations, stepGate));
+        require(IVerifier(verifier).verify(
+            update.proof, update.init_params, update.columns_rotations, stepGate),
+            "Step proof verification failed");
     }
 
     /// @notice Serializes the public inputs and verifies the rotate proof.
@@ -198,7 +199,7 @@ contract EthereumLightClient is IProtocolState, Ownable, IZKLightClient {
         }
         inputs[32] = uint256(SSZ.toLittleEndian(uint256(update.syncCommitteePoseidon)));
 
-        require(IVerifier(verifier).verify(proof.blob, proof.init_params, proof.columns_rotations, rotateGate));
+        require(IVerifier(verifier).verify(proof.blob, proof.init_params, proof.columns_rotations, rotateGate));   
     }
 
     /// @notice Gets the sync committee period from a slot.

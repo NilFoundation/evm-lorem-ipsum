@@ -8,6 +8,8 @@ struct LightClientUpdate {
     bytes32 finalizedHeaderRoot;
     bytes32 executionStateRoot;
     bytes proof;
+    uint256[] init_params;
+    int256[][] columns_rotations;
 }
 
 interface IZKLightClient {
