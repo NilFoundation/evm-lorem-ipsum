@@ -9,8 +9,8 @@
             "name": "ethereum", 
             "version": "1.0.7",
             "deploy": {
-                "placeholderVerifier": "0x3b1693402F2283539eb9cc7e3985b09b405E57E3",
-                "step": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+                "placeholderVerifier": "0x358AFE29bA527BE7D17e3E5626a11bBc4Ad5C112",
+                "step": "0x0dcD7275df21BA5e1a6dDFeaB7A69c84D5C7F5C5",
                 "rotate": "0x19ccbcc80ffd3cd5eb928ac473f56b97427d911f",
                 "genesisValidatorsRoot": "0x00000000000000000000000000000000000000000000000000000000000000AA",
                 "genesisTime": 16,
