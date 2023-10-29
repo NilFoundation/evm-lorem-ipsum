@@ -1,8 +1,10 @@
 const fs = require('fs');
-const { getVerifierParams } = require("../test/utils.js");
+const { getVerifierParams, getAccountVerifierParams, getFileContents } = require("../test/utils.js");
 const { expect } = require("chai");
 const { task } = require("hardhat/config");
 const losslessJSON = require('lossless-json');
+const path = require('path');
+const { uptime } = require('process');
 
 function bigintReviver(key, value) {
     if (value && value.isLosslessNumber) {
@@ -78,11 +80,22 @@ task("callStep", "Calls the step function on EthereumLightClient")
             "EthereumLightClient", taskArgs.clientAddress);
         const accounts = await ethers.getSigners();
 
-        const jsonString = fs.readFileSync('test/data/update.json', 'utf-8');
-        update = losslessJSON.parse(jsonString, bigintReviver);
+        // const accountParamsFile = path.resolve(__dirname,
+        //     "../test/data/mina_account/verifier_params_account.json");
+        const accountProofFile = path.resolve(__dirname,
+            "../test/data/mina_account/proof_account.bin");
+        
+        // let params_account = getAccountVerifierParams(accountParamsFile);
+        let accountProof = getFileContents(accountProofFile);
 
+        const jsonString = fs.readFileSync('test/data/update_mina.json', 'utf-8');
+        update = losslessJSON.parse(jsonString, bigintReviver);
+        
+        update.proof = accountProof;
+        
         // Spoil the proof
-        // update.proof = update.proof.slice(0, -1) + '0';
+        // update.proof = update.proof.slice(0, -1) + '1';
+        console.log(update);
 
         // Call the step function
         const tx = await ethereumLightClient.connect(accounts[0]).step(update);

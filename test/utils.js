@@ -52,8 +52,19 @@ function getVerifierParams(configPath, proofPath, publicInputPath) {
     return params
 }
 
+function getAccountVerifierParams(verifierParamsFile) {
+    let account_path_params = loadParamsFromFile(verifierParamsFile);
+    return account_path_params;
+}
+
+function getFileContents(filePath) {
+    return fs.readFileSync(filePath, 'utf8');
+}
+
 module.exports = {
     getVerifierParams,
     loadParamsFromFile,
     loadPublicInput,
+    getAccountVerifierParams,
+    getFileContents
 }
