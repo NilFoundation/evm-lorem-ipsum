@@ -1,4 +1,4 @@
-# Lorem Ipsum: Ethereum zkOracle for L1s/L2s, Beacon Chain or Historical Data.
+# Lorem Ipsum: zkOracle bringing L1s/L2s, Beacon Chain or Ethereum Historical Data to Ethereum.
 
 [![Discord](https://img.shields.io/discord/969303013749579846.svg?logo=discord&style=flat-square)](https://discord.gg/KmTAEjbmM3)
 [![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=flat-square&logo=telegram&logoColor=dark)](https://t.me/nilfoundation)
