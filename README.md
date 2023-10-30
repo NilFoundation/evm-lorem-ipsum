@@ -1,4 +1,4 @@
-# EVM-Lorem-Ipsum
+# Lorem Ipsum: Ethereum zkOracle for L1s/L2s, Beacon Chain or Historical Data.
 
 The repository contains the implementation of the Lorem Ipsum that includes Solidity smart contracts and tests.
 
