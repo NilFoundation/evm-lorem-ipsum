@@ -1,6 +1,8 @@
 # Lorem Ipsum: Ethereum zkOracle for L1s/L2s, Beacon Chain or Historical Data.
 
-The repository contains the implementation of the Lorem Ipsum that includes Solidity smart contracts and tests.
+[![Discord](https://img.shields.io/discord/969303013749579846.svg?logo=discord&style=flat-square)](https://discord.gg/KmTAEjbmM3)
+[![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=flat-square&logo=telegram&logoColor=dark)](https://t.me/nilfoundation)
+[![Twitter](https://img.shields.io/twitter/follow/nil_foundation)](https://twitter.com/nil_foundation)
 
 ----------------------------
 ### Project architecture
