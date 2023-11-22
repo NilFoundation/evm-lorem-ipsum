@@ -6,6 +6,7 @@ require('@openzeppelin/hardhat-upgrades');
 require("hardhat-contract-sizer");
 
 import './tasks/verify_mina_proof'
+import './tasks/maintain'
 
 const SEPOLIA_PRIVATE_KEY="SEPOLIA_PRIVATE_KEY"
 const SEPOLIA_ALCHEMY_KEY="SEPOLIA_ALCHEMY_KEY"

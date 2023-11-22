@@ -3,6 +3,9 @@ import "../interfaces/IProofHandler.sol";
 import "../ethereum/EthereumLightClient.sol";
 
 
+import '@nilfoundation/evm-placeholder-verification/contracts/verifier.sol';
+import '@nilfoundation/evm-placeholder-verification/contracts/test/unified_addition/unified_addition_gen.sol';
+
 
 contract MockEthereumLightClientHandler is IProofHandler {
     
